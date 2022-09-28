@@ -39,11 +39,42 @@ def bounding_box(A,B,C):
             ymax = y
     return V3(xmin, ymin), V3(xmax, ymax)
 
-def color (r,g,b):
-    return bytes([round(b),round(g),round(r)])
+# def color (r,g,b):
+#     return bytes([round(b),round(g),round(r)])
 
-BLACK = color(0,0,0)
-WHITE = color(255,255,255)
+class Color(object):
+    def __init__(self,r,g,b):
+        self.r = min(255,max(r,0))
+        self.g = min(255,max(g,0))
+        self.b = min(255,max(b,0))
+
+    def __mul__(self,other):
+        r = self.r
+        g = self.g 
+        b = self.b
+
+        if (type(other) == int or type(other) == float):
+            r *= other
+            g *= other
+            b *= other
+        else:
+            r *= other.r
+            g *= other.g
+            b *= other.b
+
+        r = min(255,max(r,0))
+        g = min(255,max(g,0))
+        b = min(255,max(b,0))
+        return Color(r,g,b)
+
+
+    def toBytes(self):
+        return bytes([int(self.b),int(self.g),int(self.r)])
+
+        
+
+BLACK = Color(0,0,0)
+WHITE = Color(255,255,255)
 
 def barycentric(A,B,C,P):
     
@@ -86,7 +117,7 @@ def writebmp(filename, width, height, framebuffer):
         #pixel data
         for y in range(height):
             for x in range(width):
-                f.write(framebuffer[y][x])
+                f.write(framebuffer[y][x].toBytes())
 
         f.close()
 

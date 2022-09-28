@@ -1,18 +1,20 @@
-from lib import *
 import random
 from math import *
 from sphere import *
+from lib import *
 from vector import *
+from material import *
+from light import *
 
 class Raytracer(object):
     def __init__(self,width,height):
         self.width = width
         self.height = height
-        self.clear_color = color(0,0,0)
-        self.current_color = color(255,255,255)
+        self.clear_color = Color(0,0,0)
+        self.current_color = Color(255,255,255)
         self.framebuffer = []
         self.scene = []
-        self.colors = []
+        self.light = Light(V3(0,0,0),1)
         self.prob = None
         self.clear()
 
@@ -61,50 +63,61 @@ class Raytracer(object):
                     self.point(x,y,c)
 
     def cast_ray(self,origin,direction):
-        color_id = 0
-        for o in self.scene:
-            if o.ray_intersect(origin,direction):
-                return r.colors[color_id]
-            color_id += 1
-        return self.clear_color
+        material, intersect = self.scene_intersect(origin,direction)
 
-RED = color(255,0,0)
-ORANGE = color(243, 156, 18)
+        if material is None:
+            return self.clear_color
+
+        light_dir = (self.light.position - intersect.point).norm()
+        intensity = light_dir @ intersect.normal
+
+        actual_diffuse = Color(
+            round(material.diffuse.r) * intensity,
+            round(material.diffuse.g) * intensity,
+            round(material.diffuse.b) * intensity,
+            )
+
+        return actual_diffuse
+
+    def scene_intersect(self,origin,direction):
+        zbuffer = 999999
+        material = None
+        intersect = None
+
+        for o in self.scene:
+            object_intersect = o.ray_intersect(origin,direction)
+            if object_intersect:
+                if object_intersect.distance < zbuffer:
+                    zbuffer = object_intersect.distance
+                    material =  o.material
+                    intersect = object_intersect
+        return material,intersect
+
+RED = Material(Color(255,0,0))
+ORANGE = Material(Color(243, 156, 18))
 
 r = Raytracer(800,800)
+r.light = Light(V3(-1,5,0),1)
 r.scene = [
+    Sphere(V3(-3,0, -16),2,RED),
+    Sphere(V3(2.8,0, -20),2,ORANGE),
     #ojos
-    Sphere(V3(2,-15, -60),1),
-    Sphere(V3(-2,-15, -60),1),
-    #nariz
-    Sphere(V3(0,-17, -80),1),
-    #boca
-    Sphere(V3(3,-15, -80),1),
-    Sphere(V3(1,-13, -80),1),
-    Sphere(V3(-1,-13, -80),1),
-    Sphere(V3(-3,-15, -80),1),
-    #botones
-    Sphere(V3(0,-4, -60),1),
-    Sphere(V3(0,0, -60),1),
-    Sphere(V3(0,4, -60),1),
-    #cuerpo
-    Sphere(V3(0, -4, -20), 2),
-    Sphere(V3(0, 0, -20), 3),
-    
-]
-r.colors = [
-    BLACK,
-    BLACK,
-    ORANGE,
-    BLACK,
-    BLACK,
-    BLACK,
-    BLACK,
-    BLACK,
-    BLACK,
-    BLACK,
-    WHITE,
-    WHITE
+    # Sphere(V3(-3,0, -60),2,RED),
+    # Sphere(V3(-2,-15, -60),2,ORANGE),
+    # #nariz
+    # Sphere(V3(0,-17, -80),1),
+    # #boca
+    # Sphere(V3(3,-15, -80),1),
+    # Sphere(V3(1,-13, -80),1),
+    # Sphere(V3(-1,-13, -80),1),
+    # Sphere(V3(-3,-15, -80),1),
+    # #botones
+    # Sphere(V3(0,-4, -60),1),
+    # Sphere(V3(0,0, -60),1),
+    # Sphere(V3(0,4, -60),1),
+    # #cuerpo
+    # Sphere(V3(0, -4, -20), 2),
+    # Sphere(V3(0, 0, -20), 3),
     
 ]
 #r.probability(0.1)
