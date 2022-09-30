@@ -14,7 +14,7 @@ class Raytracer(object):
         self.current_color = Color(255,255,255)
         self.framebuffer = []
         self.scene = []
-        self.light = Light(V3(0,0,0),1)
+        self.light = Light(V3(0,0,0),1, Color(255,255,255))
         self.prob = None
         self.clear()
 
@@ -69,15 +69,18 @@ class Raytracer(object):
             return self.clear_color
 
         light_dir = (self.light.position - intersect.point).norm()
-        intensity = light_dir @ intersect.normal
 
-        actual_diffuse = Color(
-            round(material.diffuse.r) * intensity,
-            round(material.diffuse.g) * intensity,
-            round(material.diffuse.b) * intensity,
-            )
+        #diffuse component
+        diffuse_intensity = light_dir @ intersect.normal
+        diffuse = material.diffuse * diffuse_intensity * material.albedo[0]
 
-        return actual_diffuse
+        #specular component
+        light_reflection = reflect(light_dir, intersect.normal)
+        reflection_intensity = max(0, light_reflection @ direction)
+        specular_intensity = reflection_intensity ** material.spec
+        specular = self.light.c * specular_intensity * material.albedo[1]
+
+        return diffuse + specular
 
     def scene_intersect(self,origin,direction):
         zbuffer = 999999
@@ -93,32 +96,16 @@ class Raytracer(object):
                     intersect = object_intersect
         return material,intersect
 
-RED = Material(Color(255,0,0))
-ORANGE = Material(Color(243, 156, 18))
+# RED = Material(Color(255,0,0))
+# ORANGE = Material(Color(243, 156, 18))
+rubber = Material(diffuse=Color(80,0,0), albedo = [0.9,0.1], spec = 10)
+ivory = Material(diffuse=Color(100,100,50), albedo = [0.6,0.3], spec = 50)
 
 r = Raytracer(800,800)
-r.light = Light(V3(-1,5,0),1)
+r.light = Light(V3(-20,20,20),1, Color(255,255,255))
 r.scene = [
-    Sphere(V3(-3,0, -16),2,RED),
-    Sphere(V3(2.8,0, -20),2,ORANGE),
-    #ojos
-    # Sphere(V3(-3,0, -60),2,RED),
-    # Sphere(V3(-2,-15, -60),2,ORANGE),
-    # #nariz
-    # Sphere(V3(0,-17, -80),1),
-    # #boca
-    # Sphere(V3(3,-15, -80),1),
-    # Sphere(V3(1,-13, -80),1),
-    # Sphere(V3(-1,-13, -80),1),
-    # Sphere(V3(-3,-15, -80),1),
-    # #botones
-    # Sphere(V3(0,-4, -60),1),
-    # Sphere(V3(0,0, -60),1),
-    # Sphere(V3(0,4, -60),1),
-    # #cuerpo
-    # Sphere(V3(0, -4, -20), 2),
-    # Sphere(V3(0, 0, -20), 3),
-    
+    Sphere(V3(-3,0, -16),2,rubber),
+    Sphere(V3(2.8,0, -20),2,ivory),    
 ]
 #r.probability(0.1)
 r.render()
