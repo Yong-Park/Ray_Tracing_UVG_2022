@@ -10,7 +10,7 @@ class Raytracer(object):
     def __init__(self,width,height):
         self.width = width
         self.height = height
-        self.clear_color = Color(0,0,0)
+        self.clear_color = Color(255,255,255)
         self.current_color = Color(255,255,255)
         self.framebuffer = []
         self.scene = []
@@ -100,12 +100,55 @@ class Raytracer(object):
 # ORANGE = Material(Color(243, 156, 18))
 rubber = Material(diffuse=Color(80,0,0), albedo = [0.9,0.1], spec = 10)
 ivory = Material(diffuse=Color(100,100,50), albedo = [0.6,0.3], spec = 50)
+red_clay = Material(diffuse=Color(255,0,0), albedo = [0.9,0.1], spec = 50)
+black = Material(diffuse=Color(255,0,0), albedo = [0.04,0.96], spec = 50)
+grass = Material(diffuse=Color(0,255,0), albedo = [0.03,0.97], spec = 50)
+
 
 r = Raytracer(800,800)
-r.light = Light(V3(-20,20,20),1, Color(255,255,255))
+r.light = Light(V3(0,0,0),1, Color(255,255,255))
 r.scene = [
-    Sphere(V3(-3,0, -16),2,rubber),
-    Sphere(V3(2.8,0, -20),2,ivory),    
+    #izquierda
+    Sphere(V3(-7,0, -20),1,red_clay),
+    Sphere(V3(-6,3, -20),1,red_clay),
+    #derecha
+    Sphere(V3(-3,0, -20),1,red_clay),
+    Sphere(V3(-4,3, -20),1,red_clay),
+    #cabeza
+    Sphere(V3(-5,-2, -20),1.5,red_clay),
+    #eyes
+    Sphere(V3(-5,-2.5, -18),0.2,black),
+    Sphere(V3(-4,-2.5, -18),0.2,black),
+    #body
+    Sphere(V3(-5,1, -20),2,rubber),
+    #parte de nariz
+    Sphere(V3(-4.65,-1.5, -18.5),0.5,red_clay),
+    #nariz
+    Sphere(V3(-4.5,-1.5, -18),0.2,black),
+    #ears
+    Sphere(V3(-6,-3.5, -20),0.5,red_clay),
+    Sphere(V3(-4,-3.5, -20),0.5,red_clay),
+    
+    #izquierda
+    Sphere(V3(7,0, -20),1,grass),
+    Sphere(V3(6,3, -20),1,grass),
+    #derecha
+    Sphere(V3(3,0, -20),1,grass),
+    Sphere(V3(4,3, -20),1,grass),
+    #cabeza
+    Sphere(V3(5,-2, -20),1.5,grass),
+    #eyes
+    Sphere(V3(5,-2.5, -18),0.2,black),
+    Sphere(V3(4,-2.5, -18),0.2,black),
+    #body
+    Sphere(V3(5,1, -20),2,ivory),
+    #parte de nariz
+    Sphere(V3(4.65,-1.5, -18.5),0.5,grass),
+    #nariz
+    Sphere(V3(4.5,-1.5, -18),0.2,black),
+    #ears
+    Sphere(V3(6,-3.5, -20),0.5,grass),
+    Sphere(V3(4,-3.5, -20),0.5,grass),    
 ]
 #r.probability(0.1)
 r.render()
