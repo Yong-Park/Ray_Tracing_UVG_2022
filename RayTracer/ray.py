@@ -70,15 +70,25 @@ class Raytracer(object):
 
         light_dir = (self.light.position - intersect.point).norm()
 
+        shadow_bias = 1.1
+        shador_origin = intersect.point + (intersect.normal * shadow_bias)
+        shadow_material = self.scene_intersect(shador_origin, light_dir)
+
+        shadow_intensity = 1
+        if shadow_material:
+            # estamos en la sombra
+            shadow_intensity = 0.3
+
         #diffuse component
         diffuse_intensity = light_dir @ intersect.normal
-        diffuse = material.diffuse * diffuse_intensity * material.albedo[0]
+        diffuse = material.diffuse * diffuse_intensity * material.albedo[0] * shadow_intensity
 
         #specular component
         light_reflection = reflect(light_dir, intersect.normal)
         reflection_intensity = max(0, light_reflection @ direction)
         specular_intensity = reflection_intensity ** material.spec
         specular = self.light.c * specular_intensity * material.albedo[1]
+
 
         return diffuse + specular
 
@@ -106,7 +116,7 @@ grass = Material(diffuse=Color(0,255,0), albedo = [0.03,0.97], spec = 50)
 
 
 r = Raytracer(800,800)
-r.light = Light(V3(0,0,0),1, Color(255,255,255))
+r.light = Light(V3(20,20,20),1, Color(255,255,255))
 r.scene = [
     #izquierda
     Sphere(V3(-7,0, -20),1,red_clay),
