@@ -74,14 +74,14 @@ class Raytracer(object):
         shador_origin = intersect.point + (intersect.normal * shadow_bias)
         shadow_material = self.scene_intersect(shador_origin, light_dir)
 
-        shadow_intensity = 1
+        shadow_intensity = 0
         if shadow_material:
             # estamos en la sombra
-            shadow_intensity = 0.3
+            shadow_intensity = 0.7
 
         #diffuse component
         diffuse_intensity = light_dir @ intersect.normal
-        diffuse = material.diffuse * diffuse_intensity * material.albedo[0] * shadow_intensity
+        diffuse = material.diffuse * diffuse_intensity * material.albedo[0] * (1-shadow_intensity)
 
         #specular component
         light_reflection = reflect(light_dir, intersect.normal)
@@ -116,51 +116,57 @@ grass = Material(diffuse=Color(0,255,0), albedo = [0.03,0.97], spec = 50)
 
 
 r = Raytracer(800,800)
-r.light = Light(V3(20,20,20),1, Color(255,255,255))
+r.light = Light(V3(-20,20,20),2, Color(255,255,255))
 r.scene = [
-    #izquierda
-    Sphere(V3(-7,0, -20),1,red_clay),
-    Sphere(V3(-6,3, -20),1,red_clay),
-    #derecha
-    Sphere(V3(-3,0, -20),1,red_clay),
-    Sphere(V3(-4,3, -20),1,red_clay),
-    #cabeza
-    Sphere(V3(-5,-2, -20),1.5,red_clay),
-    #eyes
-    Sphere(V3(-5,-2.5, -18),0.2,black),
-    Sphere(V3(-4,-2.5, -18),0.2,black),
-    #body
-    Sphere(V3(-5,1, -20),2,rubber),
-    #parte de nariz
-    Sphere(V3(-4.65,-1.5, -18.5),0.5,red_clay),
-    #nariz
-    Sphere(V3(-4.5,-1.5, -18),0.2,black),
-    #ears
-    Sphere(V3(-6,-3.5, -20),0.5,red_clay),
-    Sphere(V3(-4,-3.5, -20),0.5,red_clay),
-    
-    #izquierda
-    Sphere(V3(7,0, -20),1,grass),
-    Sphere(V3(6,3, -20),1,grass),
-    #derecha
-    Sphere(V3(3,0, -20),1,grass),
-    Sphere(V3(4,3, -20),1,grass),
-    #cabeza
-    Sphere(V3(5,-2, -20),1.5,grass),
-    #eyes
-    Sphere(V3(5,-2.5, -18),0.2,black),
-    Sphere(V3(4,-2.5, -18),0.2,black),
-    #body
-    Sphere(V3(5,1, -20),2,ivory),
-    #parte de nariz
-    Sphere(V3(4.65,-1.5, -18.5),0.5,grass),
-    #nariz
-    Sphere(V3(4.5,-1.5, -18),0.2,black),
-    #ears
-    Sphere(V3(6,-3.5, -20),0.5,grass),
-    Sphere(V3(4,-3.5, -20),0.5,grass),    
+    Sphere(V3(0, -1.5, -10), 1.5, ivory),
+    Sphere(V3(-2, -1, -12), 2, rubber),
+    Sphere(V3(1, 1, -8), 1.7, rubber),
+    Sphere(V3(-2, 2, -10), 2, ivory),
 ]
+# r.scene = [
+#     #izquierda
+#     Sphere(V3(-7,0, -20),1,red_clay),
+#     Sphere(V3(-6,3, -20),1,red_clay),
+#     #derecha
+#     Sphere(V3(-3,0, -20),1,red_clay),
+#     Sphere(V3(-4,3, -20),1,red_clay),
+#     #cabeza
+#     Sphere(V3(-5,-2, -20),1.5,red_clay),
+#     #eyes
+#     Sphere(V3(-5,-2.5, -18),0.2,black),
+#     Sphere(V3(-4,-2.5, -18),0.2,black),
+#     #body
+#     Sphere(V3(-5,1, -20),2,rubber),
+#     #parte de nariz
+#     Sphere(V3(-4.65,-1.5, -18.5),0.5,red_clay),
+#     #nariz
+#     Sphere(V3(-4.5,-1.5, -18),0.2,black),
+#     #ears
+#     Sphere(V3(-6,-3.5, -20),0.5,red_clay),
+#     Sphere(V3(-4,-3.5, -20),0.5,red_clay),
+    
+#     #izquierda
+#     Sphere(V3(7,0, -20),1,grass),
+#     Sphere(V3(6,3, -20),1,grass),
+#     #derecha
+#     Sphere(V3(3,0, -20),1,grass),
+#     Sphere(V3(4,3, -20),1,grass),
+#     #cabeza
+#     Sphere(V3(5,-2, -20),1.5,grass),
+#     #eyes
+#     Sphere(V3(5,-2.5, -18),0.2,black),
+#     Sphere(V3(4,-2.5, -18),0.2,black),
+#     #body
+#     Sphere(V3(5,1, -20),2,ivory),
+#     #parte de nariz
+#     Sphere(V3(4.65,-1.5, -18.5),0.5,grass),
+#     #nariz
+#     Sphere(V3(4.5,-1.5, -18),0.2,black),
+#     #ears
+#     Sphere(V3(6,-3.5, -20),0.5,grass),
+#     Sphere(V3(4,-3.5, -20),0.5,grass),    
+# ]
 #r.probability(0.1)
 r.render()
 
-r.write('r.bmp')
+r.write('prueba.bmp')
