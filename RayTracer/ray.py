@@ -5,6 +5,9 @@ from lib import *
 from vector import *
 from material import *
 from light import *
+from plane import *
+from envmap import *
+from texture import *
 
 MAX_RECURSION_DEPTH = 3
 
@@ -12,13 +15,14 @@ class Raytracer(object):
     def __init__(self,width,height):
         self.width = width
         self.height = height
-        self.clear_color = Color(0,0,100)
+        self.clear_color = Color(255,255,255)
         self.current_color = Color(255,255,255)
-        self.framebuffer = []
+        self.clear()
         self.scene = []
+        self.active_texture = None
+        self.envmap = None
         self.light = Light(V3(0,0,0),1, Color(255,255,255))
         self.prob = None
-        self.clear()
 
     def clear(self):
         self.framebuffer = [
@@ -63,15 +67,17 @@ class Raytracer(object):
                     c = self.cast_ray(origin,direction)
 
                     self.point(x,y,c)
+    def paint_backgound(self,direction):
+        return self.envmap.get_color(direction) if (self.envmap is not None) else self.clear_color
 
     def cast_ray(self,origin,direction, recursion = 0):
         if recursion >= MAX_RECURSION_DEPTH:
-            return self.clear_color
+            return self.paint_backgound(direction)
 
         material, intersect = self.scene_intersect(origin,direction)
 
         if material is None:
-            return self.clear_color
+            return self.paint_backgound(direction)
 
         light_dir = (self.light.position - intersect.point).norm()
 
@@ -97,8 +103,7 @@ class Raytracer(object):
 
         #reflection
         if material.albedo[2] > 0:
-            reverse_direction = direction * -1
-            reflect_direction = reflect(reverse_direction,intersect.normal)
+            reflect_direction = reflect(direction,intersect.normal)
             reflect_bias = -0.5 if reflect_direction @ intersect.normal < 0 else 0.5
             reflect_origin = intersect.point + (intersect.normal * reflect_bias) 
             reflect_color = self.cast_ray(reflect_origin,reflect_direction, recursion + 1)
@@ -106,7 +111,16 @@ class Raytracer(object):
             reflect_color = Color(0,0,0)
         reflection = reflect_color * material.albedo[2]
 
-        return diffuse + specular + reflection
+        if (material.albedo[3] > 0):
+            refraction_direction = refract(direction, intersect.normal, material.refractive_index)
+            refraction_bias = -0.5 if ((refraction_direction @ intersect.normal) < 0) else 0.5
+            refraction_origin = (intersect.point + (intersect.normal * refraction_bias))
+            refract_color = self.cast_ray(refraction_origin, refraction_direction, (recursion + 1))
+        else:
+            refract_color = Color(0, 0, 0)
+        refraction = refract_color * material.albedo[3]
+
+        return diffuse + specular + reflection + refraction
 
     def scene_intersect(self,origin,direction):
         zbuffer = 999999
@@ -124,22 +138,29 @@ class Raytracer(object):
 
 # RED = Material(Color(255,0,0))
 # ORANGE = Material(Color(243, 156, 18))
-rubber = Material(diffuse=Color(80,0,0), albedo = [0.9,0.1,0], spec = 10)
-ivory = Material(diffuse=Color(255,255,255), albedo = [0.6,0.3,0], spec = 50)
+rubber = Material(diffuse=Color(130,0,0), albedo = [0.9,0.1,0,0], spec = 10)
+ivory = Material(diffuse=Color(255,255,255), albedo = [0.6,0.3,0.1,0], spec = 50)
 red_clay = Material(diffuse=Color(255,0,0), albedo = [0.9,0.1], spec = 50)
 black = Material(diffuse=Color(255,0,0), albedo = [0.04,0.96], spec = 50)
 grass = Material(diffuse=Color(0,255,0), albedo = [0.03,0.97], spec = 50)
-mirror = Material(diffuse=Color(255,255,255), albedo = [0,1,0.8], spec = 1425)
-
+mirror = Material(diffuse=Color(255,255,255), albedo = [0,1,0.8, 0], spec = 1425)
+glass = Material(diffuse = Color(150, 180, 200), albedo = [0, 0.5, 0, 0.8], spec = 125, refractive_index = 1.5)
 
 r = Raytracer(800,800)
+r.envmap = Envmap('./RayTracer/envmap.bmp')
+
 r.light = Light(V3(-20,20,20),2, Color(255,255,255))
 r.scene = [
     Sphere(V3(0, -1.5, -10), 1.5, ivory),
-    # Sphere(V3(-2, -1, -12), 0.5, mirror),
+    Sphere(V3(0, 0, -5), 0.5, glass),
     Sphere(V3(1, 1, -8), 1.7, rubber),
-    Sphere(V3(-3, 3, -10), 2, mirror),
+    Sphere(V3(-2, 1, -10), 2, mirror),
+    Plano(V3(0, 2, -5), 2, 2, mirror),
 ]
+r.render()
+
+r.write('prueba.bmp')
+
 # r.scene = [
 #     #izquierda
 #     Sphere(V3(-7,0, -20),1,red_clay),
@@ -184,6 +205,3 @@ r.scene = [
 #     Sphere(V3(4,-3.5, -20),0.5,grass),    
 # ]
 #r.probability(0.1)
-r.render()
-
-r.write('prueba.bmp')
