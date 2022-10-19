@@ -29,6 +29,7 @@ class Sphere(object):
 
         impact = (direction * t0) + origin 
         normal = (impact - self.center).norm()
+        print(t0)
 
         return Intersect(
             distance = t0,

@@ -8,6 +8,7 @@ from light import *
 from plane import *
 from envmap import *
 from texture import *
+from cube import *
 
 MAX_RECURSION_DEPTH = 3
 
@@ -148,14 +149,14 @@ glass = Material(diffuse = Color(150, 180, 200), albedo = [0, 0.5, 0, 0.8], spec
 
 r = Raytracer(800,800)
 r.envmap = Envmap('./RayTracer/envmap.bmp')
-
 r.light = Light(V3(-20,20,20),2, Color(255,255,255))
 r.scene = [
-    Sphere(V3(0, -1.5, -10), 1.5, ivory),
-    Sphere(V3(0, 0, -5), 0.5, glass),
-    Sphere(V3(1, 1, -8), 1.7, rubber),
-    Sphere(V3(-2, 1, -10), 2, mirror),
-    Plano(V3(0, 2, -5), 2, 2, mirror),
+    # Sphere(V3(0, -1.5, -10), 1.5, ivory),
+    # Sphere(V3(0, 0, -5), 0.5, glass),
+    # Sphere(V3(1, 1, -8), 1.7, rubber),
+    # Sphere(V3(-2, 1, -10), 2, mirror),
+    #Plano(V3(0, 2, -5), 2, 2, mirror),
+    Cubo(V3(0,1,-5),V3(-1/4,-1/4,-1),V3(1/2,1/2,1),mirror)
 ]
 r.render()
 
