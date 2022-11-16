@@ -36,6 +36,12 @@ class V3(object):
             self.z * other.x - self.x * other.z,
             self.x * other.y - self.y * other.x
         )
+    def __truediv__(self,other):
+        return V3(
+            self.x / other.x,
+            self.y / other.y,
+            self.z / other.z
+        )
 
     def __matmul__(self,other):
         return self.x * other.x + self.y * other.y + self.z * other.z

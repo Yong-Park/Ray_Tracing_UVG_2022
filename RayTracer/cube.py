@@ -1,49 +1,82 @@
+#https://inmensia.com/articulos/raytracing/planotrianguloycubo.html
+#teoria obtenido de esta pagina
+
 from vector import *
 from intersect import *
 
-class Cubo(object):
-    def __init__(self,center,vmin,vmax,material):
+class Cubo(object): 
+    def __init__(self, center, largo, material):
         self.center = center
-        self.vmin = vmin 
-        self.vmax= vmax
-        self.material = material   
+        self.largo = largo
+        self.material = material
 
-    def ray_intersect(self,origin,direction):
-        # invdir = 1 / direction
+    def ray_intersect(self, origin, direction):
+        tnear = float('-inf')
+        tfar = float('inf')
 
-        tmin = (self.vmin.x - origin.x) / direction.x
-        tmax = (self.vmax.x - origin.x) / direction.x
-        tymin = (self.vmin.y - origin.y) / direction.y
-        tymax = (self.vmax.y - origin.y) / direction.y
+        ml = self.largo / 2
 
-        if ((tmin > tymax) or (tymin > tmax)):
-            return None
+        # interseccion en x
+        t1 = ((self.center.x - ml) - origin.x) / direction.x
+        t2 = ((self.center.x + ml) - origin.x) / direction.x
 
-        if (tymin > tmin):
-            tmin = tymin
-        if (tymax < tmax):
-            tmax = tymax
+        if t1 > t2:
+            t1, t2 = t2, t1
 
-        tzmin = (self.vmin.z - origin.z) / direction.z
-        tzmax = (self.vmax.z - origin.z) / direction.z
+        if t1 > tnear:
+            tnear = t1
 
-        if ((tmin > tzmax) or (tzmin > tmax)):
-            return None
+        if t2 < tfar:
+            tfar = t2
 
-        if (tzmin > tmin):
-            tmin = tzmin
-        if(tzmax < tmax):
-            tmax = tzmax
+        if tnear > tfar:
+            return False
 
-        normal = V3(1,1,0)
-        impact = (direction * tmax) + origin
+        # interseccion en y
+        t1 = ((self.center.y - ml) - origin.y) / direction.y
+        t2 = ((self.center.y + ml) - origin.y) / direction.y
 
-        # print('tmin ', tmin)
-        # print('tmax ', tmax)
+        if t1 > t2:
+            t1, t2 = t2, t1
+
+        if t1 > tnear:
+            tnear = t1
+
+        if t2 < tfar:
+            tfar = t2
+
+        if tnear > tfar:
+            return False
+
+        # interseccion en z
+        t1 = ((self.center.z - ml) - origin.z) / direction.z
+        t2 = ((self.center.z + ml) - origin.z) / direction.z
+
+        if t1 > t2:
+            t1, t2 = t2, t1
+
+        if t1 > tnear:
+            tnear = t1
+
+        if t2 < tfar:
+            tfar = t2
+
+        if tnear > tfar:
+            return False
+
+        #en caso que este sea menor es porque el que esta alejado es el que choca
+        # de lo contrario tnear corresponde a la interseccion
+        if tnear < 0:
+            tnear = tfar
+            #en caso que aun cambiado sea cero regresar falso
+            if tnear < 0:
+                return False
+
+        impact = (direction * tnear) - origin
+        normal = (impact - self.center).norm()
 
         return Intersect(
-            distance = tmax,
-            point = impact,
+            distance = tnear, 
+            point = impact, 
             normal = normal,
         )
-        

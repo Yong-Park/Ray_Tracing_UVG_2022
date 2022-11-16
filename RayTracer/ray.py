@@ -9,6 +9,7 @@ from plane import *
 from envmap import *
 from texture import *
 from cube import *
+from triangle import *
 
 MAX_RECURSION_DEPTH = 3
 
@@ -155,8 +156,9 @@ r.scene = [
     # Sphere(V3(0, 0, -5), 0.5, glass),
     # Sphere(V3(1, 1, -8), 1.7, rubber),
     # Sphere(V3(-2, 1, -10), 2, mirror),
-    #Plano(V3(0, 2, -5), 2, 2, mirror),
-    Cubo(V3(0,1,-5),V3(-1/4,-1/4,-1),V3(1/2,1/2,1),mirror)
+    # Plano(V3(0, 1, -5),1,1,rubber),
+    # Cubo(V3(1,0,-5),1,glass),
+    Triangulo(V3(1,0,-5),V3(0.5,0.5,2),V3(-0.5,0.5,2),V3(0,-0.5,2),rubber)
 ]
 r.render()
 
