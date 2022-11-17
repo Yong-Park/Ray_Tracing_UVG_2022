@@ -9,7 +9,7 @@ from plane import *
 from envmap import *
 from texture import *
 from cube import *
-from triangle2 import *
+from triangle import *
 
 MAX_RECURSION_DEPTH = 3
 
