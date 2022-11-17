@@ -23,7 +23,7 @@ class Raytracer(object):
         self.scene = []
         self.active_texture = None
         self.envmap = None
-        self.light = Light(V3(0,0,0),1, Color(255,255,255))
+        self.light = Light(V3(20,20,-20),2, Color(255,255,255))
         self.prob = None
 
     def clear(self):
@@ -145,11 +145,15 @@ ivory = Material(diffuse=Color(255,255,255), albedo = [0.6,0.3,0.1,0], spec = 50
 red_clay = Material(diffuse=Color(255,0,0), albedo = [0.9,0.1], spec = 50)
 black = Material(diffuse=Color(255,0,0), albedo = [0.04,0.96], spec = 50)
 grass = Material(diffuse=Color(0,255,0), albedo = [0.03,0.97], spec = 50)
+
+#materiales a utilizar
+ocean = Material(diffuse=Color(43,101,236), albedo = [0.9,0.10,0,0], spec = 10)
 mirror = Material(diffuse=Color(255,255,255), albedo = [0,1,0.8, 0], spec = 1425)
 glass = Material(diffuse = Color(150, 180, 200), albedo = [0, 0.5, 0, 0.8], spec = 125, refractive_index = 1.5)
+wood = Material(diffuse=Color(43,101,236), albedo = [0.9,0.10,0,0], spec = 10)
 
-r = Raytracer(800,800)
-r.envmap = Envmap('./RayTracer/envmap.bmp')
+r = Raytracer(1800,1000)
+r.envmap = Envmap('./RayTracer/bg.bmp')
 r.light = Light(V3(-20,20,20),2, Color(255,255,255))
 r.scene = [
     # Sphere(V3(0, -1.5, -10), 1.5, ivory),
@@ -157,12 +161,12 @@ r.scene = [
     # Sphere(V3(1, 1, -8), 1.7, rubber),
     # Sphere(V3(-2, 1, -10), 2, mirror),
     # Plano(V3(0, 1, -5),1,1,rubber),
-    # Cubo(V3(1,0,-5),1,glass),
-    Triangulo(V3(0,0,5),1,glass)
+    Cubo(V3(1,0,-5),1,ocean),
+    # Triangulo(V3(0,0,5),1,glass),
 ]
 r.render()
 
-r.write('prueba.bmp')
+r.write('Proyecto2.bmp')
 
 # r.scene = [
 #     #izquierda
