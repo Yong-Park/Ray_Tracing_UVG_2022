@@ -37,6 +37,25 @@ class V3(object):
             self.x * other.y - self.y * other.x
         )
     def __truediv__(self,other):
+        if other.x == 0:
+            return V3(
+                0,
+                self.y / other.y,
+                self.z / other.z
+            )
+        if other.y == 0:
+            return V3(
+                self.x / other.x,
+                0,
+                self.z / other.z
+            )
+        if other.z == 0:
+            return V3(
+                self.x / other.x,
+                self.y / other.y,
+                0
+            )
+        
         return V3(
             self.x / other.x,
             self.y / other.y,
