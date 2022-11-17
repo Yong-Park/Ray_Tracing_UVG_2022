@@ -28,6 +28,7 @@ class Triangulo(object):
 
         v3 = V3(v3x,v3y,v3z)
         
+        #aplicacion de concepto de la pagina que se utilizo para entender
         v0v1 = v2 - v1
         v0v2 = v3 - v1
         pvec = direction * v0v2
